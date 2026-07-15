@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>الثمن العادل</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--bg:#08080f;--card:#0e0e1a;--c2:#131322;--bd:#1a1a30;--ac:#e8a317;--acL:#fbbf24;--ok:#10b981;--no:#ef4444;--wr:#f97316;--fg:#eaeaf0;--mt:#6a6a90;--dm:#3a3a5a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--fg);overflow:hidden;height:100dvh}
+body.fr,body.en{direction:ltr;font-family:'Inter',sans-serif}
+#map{width:100%;height:100%;z-index:1}
+.leaflet-control-zoom{display:none!important}
+.leaflet-popup-content-wrapper{background:var(--card)!important;color:var(--fg)!important;border:1px solid var(--bd)!important;border-radius:12px!important;box-shadow:0 8px 30px rgba(0,0,0,.5)!important}
+.leaflet-popup-tip{background:var(--card)!important}
+.leaflet-popup-content{margin:10px 14px!important;font-size:13px!important}
+.pin{display:flex;flex-direction:column;align-items:center}
+.pin-d{width:18px;height:18px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.pin-o .pin-d{background:var(--ok)}.pin-e .pin-d{background:var(--no)}
+.pin-l{font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,.7);padding:1px 8px;border-radius:4px;margin-top:2px;white-space:nowrap}
+.bs{position:fixed;bottom:0;left:0;right:0;z-index:1000;background:var(--card);border-top:1px solid var(--bd);border-radius:20px 20px 0 0;box-shadow:0 -10px 50px rgba(0,0,0,.6);transition:transform .4s cubic-bezier(.16,1,.3,1);max-height:88vh;overflow-y:auto}
+.bs.col{transform:translateY(calc(100% - 70px))}
+.bs::-webkit-scrollbar{width:4px}.bs::-webkit-scrollbar-thumb{background:var(--dm);border-radius:2px}
+.sh{width:40px;height:4px;background:var(--dm);border-radius:2px;margin:10px auto 6px;cursor:pointer}
+.li{width:100%;padding:12px 14px 12px 40px;border-radius:12px;background:var(--c2);border:2px solid var(--bd);color:var(--fg);font-family:'Cairo',sans-serif;font-size:14px;outline:none;transition:.3s;direction:rtl}
+body.fr .li,body.en .li{font-family:'Inter',sans-serif;direction:ltr;padding:12px 40px 12px 14px}
+.li:focus{border-color:var(--ac)}.li::placeholder{color:var(--dm)}
+body.fr .lic,body.en .lic{right:auto;left:14px}
+.lic{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:14px}
+.sg{position:absolute;top:100%;left:0;right:0;z-index:10;background:var(--c2);border:2px solid var(--bd);border-top:none;border-radius:0 0 12px 12px;max-height:200px;overflow-y:auto;display:none}
+.sg.show{display:block}
+.si{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--bd);transition:.2s;display:flex;align-items:center;gap:10px}
+.si:hover{background:rgba(232,163,23,.06)}.si:last-child{border-bottom:none}
+.si i{color:var(--mt);font-size:12px;min-width:16px}
+.vc{padding:10px 6px;border-radius:10px;border:2px solid var(--bd);background:var(--c2);text-align:center;cursor:pointer;transition:.3s;flex:1;min-width:0}
+.vc:hover{border-color:var(--dm)}.vc.on{border-color:var(--ac);background:rgba(232,163,23,.06)}.vc.on i{color:var(--ac)!important}
+.tb{flex:1;padding:8px 4px;border-radius:8px;border:2px solid var(--bd);background:var(--c2);color:var(--mt);cursor:pointer;text-align:center;font-size:11px;transition:.3s}
+.tb.on{border-color:var(--wr);color:var(--wr);background:rgba(249,115,22,.06)}
+.cb{width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--ac),#c98a0e);color:#080810;font-size:17px;font-weight:700;cursor:pointer;transition:.3s}
+.cb:hover{box-shadow:0 6px 25px rgba(232,163,23,.35);transform:translateY(-1px)}
+.cb:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.rb{display:none}.rb.show{display:block;animation:su .4s ease}
+@keyframes su{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.pb{font-size:42px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--acL),var(--ac));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ft{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:16px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:var(--ok);font-size:12px;font-weight:600}
+.dr{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px}.dr:last-child{border:none}
+.cbar{height:24px;border-radius:6px;background:var(--bd);overflow:hidden}
+.cfill{height:100%;border-radius:6px;transition:width .8s cubic-bezier(.16,1,.3,1)}
+.mb{width:40px;height:40px;border-radius:10px;border:none;background:var(--card);color:var(--fg);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(0,0,0,.4);transition:.2s;z-index:500}
+.mb:hover{background:var(--c2)}
+.lb{height:3px;background:var(--bd);border-radius:2px;overflow:hidden;position:fixed;top:0;left:0;right:0;z-index:1500;opacity:0;transition:opacity .3s}
+.lf{height:100%;width:0;background:var(--ac);border-radius:2px;transition:width .3s}
+.tm{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 20px;font-size:13px;z-index:2000;box-shadow:0 8px 30px rgba(0,0,0,.5);transition:.4s cubic-bezier(.16,1,.3,1);white-space:nowrap}
+.tm.show{transform:translateX(-50%) translateY(0)}
+.dl{position:relative}.dl::before{content:'';position:absolute;right:6px;top:24px;bottom:24px;width:2px;background:var(--bd)}
+body.fr .dl::before,body.en .dl::before{right:auto;left:6px}
+.lm{position:absolute;top:100%;left:8px;right:auto;background:var(--c2);border:2px solid var(--bd);border-radius:10px;overflow:hidden;z-index:20;min-width:140px;display:none;box-shadow:0 8px 25px rgba(0,0,0,.5)}
+body.fr .lm,body.en .lm{left:auto;right:8px}
+.lm.show{display:block}
+.lo{padding:10px 14px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;transition:.2s;border:none;background:none;color:var(--fg);width:100%;text-align:inherit}
+.lo:hover{background:rgba(232,163,23,.08)}.lo.on{color:var(--ac);background:rgba(232,163,23,.06)}
+.sb{position:absolute;left:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:2px solid var(--bd);background:var(--card);color:var(--mt);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;z-index:2}
+body.fr .sb,body.en .sb{left:auto;right:8px}
+.sb:hover{border-color:var(--ac);color:var(--ac)}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media(max-width:480px){.pb{font-size:36px}}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div style="position:fixed;bottom:90px;left:16px;z-index:500;display:flex;flex-direction:column;gap:8px">
+<button class="mb" onclick="map.zoomIn()"><i class="fas fa-plus"></i></button>
+<button class="mb" onclick="map.zoomOut()"><i class="fas fa-minus"></i></button>
+<button class="mb" onclick="goMe()" style="margin-top:8px"><i class="fas fa-crosshairs"></i></button>
+</div>
+<div class="lb" id="loadBar"><div class="lf" id="loadFill"></div></div>
+<div class="bs col" id="sheet">
+<div class="sh" id="sheetH"></div>
+<div class="px-5 pb-6">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,var(--ac),#c98a0e)"><i class="fas fa-scale-balanced text-sm" style="color:#080810"></i></div>
+<div><div class="font-bold text-sm" id="txTitle">الثمن العادل</div><div class="text-xs" style="color:var(--mt)" id="txSub">حدد نقاط الرحلة</div></div>
+</div>
+<div style="position:relative">
+<button onclick="document.getElementById('lm').classList.toggle('show')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--c2);color:var(--fg);cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12px;transition:.2s" id="lBtn"><i class="fas fa-globe" style="color:var(--ac)"></i><span id="lLbl">العربية</span><i class="fas fa-chevron-down" style="font-size:8px;color:var(--mt)"></i></button>
+<div class="lm" id="lm">
+<button class="lo on" data-l="ar" onclick="setL('ar')"><span>🇲🇦</span>العربية</button>
+<button class="lo" data-l="fr" onclick="setL('fr')"><span>🇫🇷</span>Français</button>
+<button class="lo" data-l="en" onclick="setL('en')"><span>🇬🇧</span>English</button>
+</div>
+</div>
+</div>
+<div class="dl mb-4 relative">
+<div class="relative mb-3"><i class="fas fa-circle lic" style="color:var(--ok);font-size:10px"></i><input type="text" class="li" id="oInp" placeholder="أين أنت الآن؟" autocomplete="off"><div class="sg" id="oSg"></div></div>
+<div class="relative"><i class="fas fa-circle lic" style="color:var(--no);font-size:10px"></i><input type="text" class="li" id="dInp" placeholder="إلى أين تريد الذهاب؟" autocomplete="off"><div class="sg" id="dSg"></div></div>
+<button class="sb" onclick="swap()"><i class="fas fa-arrow-right-arrow-left fa-rotate-90" style="font-size:11px"></i></button>
+</div>
+<div class="flex gap-3 mb-4" id="tripInfo" style="display:none">
+<div class="flex-1 rounded-xl p-3 text-center" style="background:var(--c2);border:1px solid var(--bd)"><div class="text-xs" style="color:var(--mt)" id="txDist">المسافة</div><div class="font-bold text-lg" style="color:var(--acL)" id="iDist">--</div><div class="text-xs" style="color:var(--dm)" id="txKm">كم</div></div>
+<div class="flex-1 rounded-xl p-3 text-center" style="background:var(--c2);border:1px solid var(--bd)"><div class="text-xs" style="color:var(--mt)" id="txDur">المدة التقريبية</div><div class="font-bold text-lg" style="color:var(--acL)" id="iTime">--</div><div class="text-xs" style="color:var(--dm)" id="txMin">دقيقة</div></div>
+</div>
+<div class="mb-4"><div class="text-xs font-bold mb-2" style="color:var(--mt)"><i class="fas fa-car ml-1" style="color:var(--ac)"></i><span id="txVeh">نوع المركبة</span></div><div class="flex gap-2 overflow-x-auto pb-1" id="vG"></div></div>
+<div class="mb-4"><div class="text-xs font-bold mb-2" style="color:var(--mt)"><i class="fas fa-traffic-light ml-1" style="color:var(--ac)"></i><span id="txTraf">حالة السير</span></div><div class="flex gap-2" id="tG"></div></div>
+<button class="cb" id="calcBtn" disabled><i class="fas fa-bolt ml-2"></i><span id="txCalc">احسب الثمن العادل</span></button>
+<div class="rb mt-4" id="res">
+<div class="rounded-xl p-5" style="background:var(--c2);border:1px solid var(--bd)">
+<div class="text-center mb-4"><div class="text-xs mb-1" style="color:var(--mt)" id="txFP">الثمن العادل للرحلة</div><div class="pb" id="rP">0.00</div><div class="text-sm mt-1" style="color:var(--mt)" id="txMAD">درهم مغربي</div><div class="mt-2"><span class="ft"><i class="fas fa-shield-halved"></i><span id="txFB">ثمن عادل ومنصف</span></span></div></div>
+<div id="rD" class="mb-4"></div><div id="rC"></div>
+</div></div>
+</div></div>
+<div class="tm" id="toast"></div>
+<script>
+var T={
+ar:{title:'الثمن العادل',sub:'حدد نقاط الرحلة',oPh:'أين أنت الآن؟',dPh:'إلى أين تريد الذهاب؟',dist:'المسافة',km:'كم',dur:'المدة التقريبية',min:'دقيقة',veh:'نوع المركبة',traf:'حالة السير',calc:'احسب الثمن العادل',fp:'الثمن العادل للرحلة',mad:'درهم مغربي',fb:'ثمن عادل ومنصف',cmp:'مقارنة مع المنصات الأخرى',fB:'أجرة الانطلاق',fD:'كلفة المسافة',fF:'تعويض الوقود',fT:'تعويض الزحمة',more:'أكثر بـ',bid:'مجال مضاربة',note:'مع الثمن العادل، توفر',note2:'مقارنة بالذروة المبالغ فيها، وتتجنب المضاربة اللي كتضر بالطرفين.',oL:'انطلاق',eL:'وصول',tC:'تم حساب الثمن العادل',tNR:'لم يتم العثور على مسار',tNN:'خطأ في الاتصال',tLO:'تم تحديد موقعك',tLF:'لم نتمكن من الوصول لموقعك',tLNS:'المتصفح لا يدعم تحديد الموقع',dm:'د.م',v:{car:'سيارة',taxi:'أجرة',moto:'نارية',mini:'حافلة',van:'شاحنة',tuk:'توك توك'},tr:{l:'خفيف',m:'متوسط',h:'مزدحم',vh:'مزدحم جداً'},ln:'العربية',sl:'ar'},
+fr:{title:'Le Prix Juste',sub:'Définissez les points du trajet',oPh:'Où êtes-vous ?',dPh:'Où allez-vous ?',dist:'Distance',km:'km',dur:'Durée estimée',min:'min',veh:'Type de véhicule',traf:'État du trafic',calc:'Calculer le prix juste',fp:'Prix juste du trajet',mad:'Dirham marocain',fb:'Prix juste et équitable',cmp:'Comparaison avec autres plateformes',fB:'Tarif de départ',fD:'Coût de la distance',fF:'Compensation carburant',fT:'Compensation trafic',more:'Plus de',bid:'Fourchette de négociation',note:'Avec le prix juste, vous économisez',note2:"par rapport aux prix de pointe, et vous évitez la surenchère.",oL:'Départ',eL:'Arrivée',tC:'Prix juste calculé',tNR:'Aucun itinéraire trouvé',tNN:'Erreur de connexion',tLO:'Position détectée',tLF:"Impossible d'accéder à votre position",tLNS:'Géolocalisation non supportée',dm:'DH',v:{car:'Voiture',taxi:'Taxi',moto:'Moto',mini:'Minibus',van:'Camionnette',tuk:'Tuk-tuk'},tr:{l:'Fluide',m:'Modéré',h:'Dense',vh:'Très dense'},ln:'Français',sl:'fr'},
+en:{title:'Fair Price',sub:'Set your trip points',oPh:'Where are you now?',dPh:'Where do you want to go?',dist:'Distance',km:'km',dur:'Estimated time',min:'min',veh:'Vehicle type',traf:'Traffic status',calc:'Calculate Fair Price',fp:'Fair price for the trip',mad:'Moroccan Dirham',fb:'Fair and equitable price',cmp:'Comparison with other platforms',fB:'Base fare',fD:'Distance cost',fF:'Fuel compensation',fT:'Traffic compensation',more:'More by',bid:'Bidding range',note:'With Fair Price, you save',note2:'compared to surge pricing, and avoid bidding that hurts both parties.',oL:'Start',eL:'End',tC:'Fair price calculated',tNR:'No route found',tNN:'Connection error',tLO:'Location detected',tLF:'Could not access your location',tLNS:'Geolocation not supported',dm:'DH',v:{car:'Car',taxi:'Taxi',moto:'Moto',mini:'Minibus',van:'Van',tuk:'Tuk-tuk'},tr:{l:'Light',m:'Moderate',h:'Heavy',vh:'Very heavy'},ln:'English',sl:'en'}
+};
+var VH=[{id:'car',ic:'fa-car',r:3.5,c:7},{id:'taxi',ic:'fa-taxi',r:2,c:7},{id:'moto',ic:'fa-motorcycle',r:1.5,c:3},{id:'mini',ic:'fa-van-shuttle',r:5,c:15},{id:'van',ic:'fa-truck',r:6,c:12},{id:'tuk',ic:'fa-truck-pickup',r:1,c:2.5}];
+var TR=[{id:'l',m:1},{id:'m',m:1.15},{id:'h',m:1.35},{id:'vh',m:1.6}];
+var lang='ar',S={o:null,d:null,v:'car',t:'m',dist:0};
+function tx(k){return T[lang][k]||k}
+function setL(l){lang=l;var h=document.documentElement;if(l==='ar'){h.setAttribute('dir','rtl');h.setAttribute('lang','ar');document.body.className='';}else{h.setAttribute('dir','ltr');h.setAttribute('lang',l);document.body.className=l;}document.getElementById('lLbl').textContent=T[l].ln;document.querySelectorAll('.lo').forEach(function(b){b.classList.toggle('on',b.dataset.l===l);});document.getElementById('txTitle').textContent=tx('title');document.getElementById('txSub').textContent=tx('sub');document.getElementById('oInp').placeholder=tx('oPh');document.getElementById('dInp').placeholder=tx('dPh');document.getElementById('txDist').textContent=tx('dist');document.getElementById('txKm').textContent=tx('km');document.getElementById('txDur').textContent=tx('dur');document.getElementById('txMin').textContent=tx('min');document.getElementById('txVeh').textContent=tx('veh');document.getElementById('txTraf').textContent=tx('traf');document.getElementById('txCalc').textContent=tx('calc');document.getElementById('txFP').textContent=tx('fp');document.getElementById('txMAD').textContent=tx('mad');document.getElementById('txFB').textContent=tx('fb');renderV();renderT();if(document.getElementById('res').classList.contains('show')&&S.dist>0)renderRC(calc());document.getElementById('lm').classList.remove('show');}
+document.addEventListener('click',function(e){if(!document.getElementById('lBtn').contains(e.target)&&!document.getElementById('lm').contains(e.target))document.getElementById('lm').classList.remove('show');});
+var map=L.map('map',{center:[33.9716,-6.8498],zoom:13,zoomControl:false,attributionControl:false});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
+var oM=null,dM=null,rL=null;
+function mkI(tp){var c=tp==='o'?'pin-o':'pin-e',lb=tp==='o'?tx('oL'):tx('eL');return L.divIcon({className:'',html:'<div class="pin '+c+'"><div class="pin-d"></div><div class="pin-l">'+lb+'</div></div>',iconSize:[40,44],iconAnchor:[20,44]});}
+function setO(la,ln,nm){S.o={la:la,ln:ln,nm:nm||tx('oL')};if(oM)map.removeLayer(oM);oM=L.marker([la,ln],{icon:mkI('o'),draggable:true}).addTo(map);oM.on('dragend',function(e){var p=e.target.getLatLng();revG(p.lat,p.lng,function(n){S.o.nm=n;document.getElementById('oInp').value=n;});upR();});document.getElementById('oInp').value=S.o.nm;upR();}
+function setD(la,ln,nm){S.d={la:la,ln:ln,nm:nm||tx('eL')};if(dM)map.removeLayer(dM);dM=L.marker([la,ln],{icon:mkI('d'),draggable:true}).addTo(map);dM.on('dragend',function(e){var p=e.target.getLatLng();revG(p.lat,p.lng,function(n){S.d.nm=n;document.getElementById('dInp').value=n;});upR();});document.getElementById('dInp').value=S.d.nm;upR();}
+var sT=null;
+function srch(q,cb){if(!q||q.length<2){cb([]);return;}var sfx=lang==='fr'?' Maroc':lang==='en'?' Morocco':' المغرب';fetch('https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(q.indexOf('المغرب')>-1||q.indexOf('Maroc')>-1||q.indexOf('Morocco')>-1?q:q+sfx)+'&accept-language='+T[lang].sl+'&limit=5&countrycodes=ma').then(function(r){return r.json();}).then(function(d){cb(d);}).catch(function(){cb([]);});}
+function revG(la,ln,cb){fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+la+'&lon='+ln+'&accept-language='+T[lang].sl).then(function(r){return r.json();}).then(function(d){cb(d.display_name?d.display_name.split(',').slice(0,3).join(','):la.toFixed(4)+', '+ln.toFixed(4));}).catch(function(){cb(la.toFixed(4)+', '+ln.toFixed(4));});}
+function setupS(iid,sid,fn){var inp=document.getElementById(iid),sg=document.getElementById(sid);inp.addEventListener('input',function(){clearTimeout(sT);var q=this.value.trim();if(q.length<2){sg.classList.remove('show');return;}sT=setTimeout(function(){srch(q,function(res){if(!res.length){sg.classList.remove('show');return;}sg.innerHTML=res.map(function(r){var sn=r.display_name.split(',').slice(0,3).join(',');return'<div class="si" data-la="'+r.lat+'" data-lo="'+r.lon+'" data-n="'+sn+'"><i class="fas fa-location-dot"></i><span>'+sn+'</span></div>';}).join('');sg.classList.add('show');sg.querySelectorAll('.si').forEach(function(it){it.addEventListener('click',function(){inp.value=this.dataset.n;sg.classList.remove('show');fn(parseFloat(this.dataset.la),parseFloat(this.dataset.lo),this.dataset.n);map.setView([parseFloat(this.dataset.la),parseFloat(this.dataset.lo)],Math.max(map.getZoom(),14));});});});},350);});inp.addEventListener('focus',function(){if(sg.children.length)sg.classList.add('show');});document.addEventListener('click',function(e){if(!inp.contains(e.target)&&!sg.contains(e.target))sg.classList.remove('show');});}
+setupS('oInp','oSg',setO);setupS('dInp','dSg',setD);
+function swap(){if(!S.o&&!S.d)return;var tmp=S.o;S.o=S.d;S.d=tmp;document.getElementById('oInp').value=S.o?S.o.nm:'';document.getElementById('dInp').value=S.d?S.d.nm:'';if(oM){map.removeLayer(oM);oM=null;}if(dM){map.removeLayer(dM);dM=null;}if(rL){map.removeLayer(rL);rL=null;}if(S.o)setO(S.o.la,S.o.ln,S.o.nm);if(S.d)setD(S.d.la,S.d.ln,S.d.nm);upR();}
+function upR(){var btn=document.getElementById('calcBtn'),info=document.getElementById('tripInfo');if(!S.o||!S.d){btn.disabled=true;info.style.display='none';if(rL){map.removeLayer(rL);rL=null;}return;}sLd(30);fetch('https://router.project-osrm.org/route/v1/driving/'+S.o.ln+','+S.o.la+';'+S.d.ln+','+S.d.la+'?overview=full&geometries=geojson').then(function(r){return r.json();}).then(function(data){hLd();if(data.code!=='Ok'||!data.routes.length){tst('tNR','wr');btn.disabled=true;info.style.display='none';return;}var route=data.routes[0];var coords=route.geometry.coordinates.map(function(c){return[c[1],c[0]];});S.dist=Math.round(route.distance/10)/100;if(rL)map.removeLayer(rL);rL=L.polyline(coords,{color:'#e8a317',weight:4,opacity:0.85,smoothFactor:1}).addTo(map);map.fitBounds(rL.getBounds(),{padding:[60,60]});info.style.display='flex';document.getElementById('iDist').textContent=S.dist.toFixed(1);document.getElementById('iTime').textContent=Math.round(route.duration/60);btn.disabled=false;}).catch(function(){hLd();tst('tNN','no');});}
+function goMe(){sLd(50);if('geolocation' in navigator){navigator.geolocation.getCurrentPosition(function(pos){hLd();var la=pos.coords.latitude,ln=pos.coords.longitude;map.setView([la,ln],15);revG(la,ln,function(n){setO(la,ln,n);tst('tLO','ok');});},function(){hLd();tst('tLF','wr');},{enableHighAccuracy:true,timeout:8000});}else{hLd();tst('tLNS','wr');}}
+var sheet=document.getElementById('sheet'),sCol=true;
+document.getElementById('sheetH').addEventListener('click',function(){sCol=!sCol;sheet.classList.toggle('col',sCol);});
+function expSh(){sCol=false;sheet.classList.remove('col');}
+function renderV(){document.getElementById('vG').innerHTML=VH.map(function(v){var nm=tx('v')[v.id],on=S.v===v.id;return'<div class="vc'+(on?' on':'')+'" data-v="'+v.id+'" tabindex="0"><i class="fas '+v.ic+' text-lg mb-1" style="color:'+(on?'var(--ac)':'var(--mt)')+'"></i><div style="font-size:11px;font-weight:600">'+nm+'</div><div style="font-size:10px;color:var(--dm)">'+v.r+' '+tx('dm')+'/km</div></div>';}).join('');document.querySelectorAll('.vc').forEach(function(c){c.addEventListener('click',function(){S.v=this.dataset.v;renderV();});});}
+function renderT(){var tn=tx('tr');document.getElementById('tG').innerHTML=TR.map(function(t){return'<button class="tb'+(S.t===t.id?' on':'')+'" data-tid="'+t.id+'">'+tn[t.id]+'<div style="font-size:9px;color:var(--dm)">x'+t.m+'</div></button>';}).join('');document.querySelectorAll('.tb').forEach(function(b){b.addEventListener('click',function(){S.t=this.dataset.tid;renderT();});});}
+function calc(){var v=VH.find(function(x){return x.id===S.v;}),tr=TR.find(function(x){return x.id===S.t;}),dist=S.dist,fp=14.5,bF=5,dC=dist*v.r,fC=dist*(v.c/100)*fp*0.3,tC=(bF+dC)*(tr.m-1),fair=Math.round((bF+dC+fC+tC)*100)/100,surge=1.5+(tr.m>1?(tr.m-1)*1.8:0),careem=Math.round(fair*surge*100)/100,inL=Math.round(fair*0.72*100)/100,inH=Math.round(fair*1.28*100)/100;return{fair:fair,bd:{b:Math.round(bF*100)/100,d:Math.round(dC*100)/100,f:Math.round(fC*100)/100,t:Math.round(tC*100)/100},careem:careem,inL:inL,inH:inH};}
+function renderRC(r){var dm=tx('dm');document.getElementById('rD').innerHTML=[['fB',r.bd.b,'fa-flag','#8b8baa'],['fD',r.bd.d,'fa-road','var(--ac)'],['fF',r.bd.f,'fa-gas-pump','var(--wr)'],['fT',r.bd.t,'fa-traffic-light','var(--no)']].map(function(x){return'<div class="dr"><span style="color:var(--mt)"><i class="fas '+x[2]+' ml-2" style="color:'+x[3]+';font-size:11px"></i>'+tx(x[0])+'</span><span class="font-bold" style="font-variant-numeric:tabular-nums">'+x[1].toFixed(2)+' '+dm+'</span></div>';}).join('');var mx=Math.max(r.fair,r.careem,r.inH,1),fP=(r.fair/mx*100).toFixed(0),cP=(r.careem/mx*100).toFixed(0),iHP=(r.inH/mx*100).toFixed(0),iLP=(r.inL/mx*100).toFixed(0),sv=Math.round(((r.careem-r.fair)/r.careem)*100);document.getElementById('rC').innerHTML='<div class="text-xs font-bold mb-3" style="color:var(--mt)"><i class="fas fa-chart-bar ml-1" style="color:var(--ac)"></i>'+tx('cmp')+'</div><div class="mb-3"><div class="flex justify-between mb-1"><span class="text-xs"><span class="inline-block w-2 h-2 rounded-full ml-1" style="background:var(--ok)"></span>'+tx('title')+'</span><span class="text-xs font-bold" style="color:var(--ok)">'+r.fair.toFixed(2)+' '+dm+'</span></div><div class="cbar"><div class="cfill" style="background:var(--ok);width:0" data-w="'+fP+'%"></div></div></div><div class="mb-3"><div class="flex justify-between mb-1"><span class="text-xs"><span class="inline-block w-2 h-2 rounded-full ml-1" style="background:var(--no)"></span>Careem</span><span class="text-xs font-bold" style="color:var(--no)">'+r.careem.toFixed(2)+' '+dm+'</span></div><div class="cbar"><div class="cfill" style="background:var(--no);width:0" data-w="'+cP+'%"></div></div><div class="text-xs mt-1" style="color:var(--no);opacity:.8">'+tx('more')+' '+sv+'%</div></div><div class="mb-3"><div class="flex justify-between mb-1"><span class="text-xs"><span class="inline-block w-2 h-2 rounded-full ml-1" style="background:var(--wr)"></span>InDrive</span><span class="text-xs font-bold" style="color:var(--wr)">'+r.inL.toFixed(0)+' — '+r.inH.toFixed(0)+' '+dm+'</span></div><div class="cbar" style="position:relative"><div class="cfill" style="background:rgba(249,115,22,.5);width:0" data-w="'+iHP+'%"></div><div style="position:absolute;top:0;height:100%;width:2px;background:var(--wr);left:'+iLP+'%;border-radius:1px"></div></div><div class="text-xs mt-1" style="color:var(--wr);opacity:.8">'+tx('bid')+': '+r.inL.toFixed(0)+' — '+r.inH.toFixed(0)+' '+dm+'</div></div><div class="mt-3 p-3 rounded-lg" style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.15)"><div class="flex items-start gap-2"><i class="fas fa-circle-check mt-0.5" style="color:var(--ok);font-size:13px"></i><span class="text-xs" style="color:var(--mt);line-height:1.7">'+tx('note')+' <b style="color:var(--no)">'+sv+'%</b> '+tx('note2')+'</span></div></div>';setTimeout(function(){document.querySelectorAll('#rC .cfill').forEach(function(b){b.style.width=b.dataset.w;});},300);}
+function showRes(r){var res=document.getElementById('res');res.classList.add('show');var pEl=document.getElementById('rP'),t0=performance.now();(function tk(now){var p=Math.min((now-t0)/800,1);pEl.textContent=(r.fair*(1-Math.pow(1-p,3))).toFixed(2);if(p<1)requestAnimationFrame(tk);})(t0);renderRC(r);expSh();setTimeout(function(){res.scrollIntoView({behavior:'smooth',block:'nearest'});},500);}
+function sLd(p){document.getElementById('loadFill').style.width=p+'%';document.getElementById('loadBar').style.opacity='1';}
+function hLd(){var f=document.getElementById('loadFill');f.style.width='100%';setTimeout(function(){document.getElementById('loadBar').style.opacity='0';f.style.width='0%';},400);}
+function tst(k,tp){var ic={ok:'fa-check-circle',wr:'fa-triangle-exclamation',no:'fa-wifi'},cl={ok:'var(--ok)',wr:'var(--wr)',no:'var(--no)'},el=document.getElementById('toast');el.innerHTML='<i class="fas '+(ic[tp]||ic.wr)+'" style="color:'+(cl[tp]||cl.wr)+';margin-left:8px"></i>'+tx(k);el.classList.add('show');setTimeout(function(){el.classList.remove('show');},3500);}
+document.getElementById('calcBtn').addEventListener('click',function(){if(!S.o||!S.d||S.dist<=0)return;showRes(calc());tst('tC','ok');});
+renderV();renderT();
+if('geolocation' in navigator){navigator.geolocation.getCurrentPosition(function(pos){map.setView([pos.coords.latitude,pos.coords.longitude],14);},function(){},{enableHighAccuracy:false,timeout:5000});}
+</script>
+</body>
+</html>
