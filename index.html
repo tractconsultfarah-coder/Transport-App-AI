@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-:root{--bg:#08080f;--card:#0e0e1a;--c2:#131322;--bd:#1a1a30;--ac:#e8a317;--acL:#fbbf24;--ok:#10b981;--no:#ef4444;--wr:#f97316;--fg:#eaeaf0;--mt:#6a6a90;--dm:#3a3a5a}
+:root{--bg:#08080f;--card:#0e0e1a;--c2:#131322;--bd:#1a1a30;--ac:#e8a317;--acL:#fbbf24;--ok:#10b981;--no:#ef4444;--wr:#f97316;--fg:#eaeaf0;--mt:#6a6a90;--dm:#3a3a5a;--ai:#3b82f6}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--fg);overflow:hidden;height:100dvh}
 body.fr,body.en{direction:ltr;font-family:'Inter',sans-serif}
@@ -41,7 +41,8 @@ body.fr .lic,body.en .lic{right:auto;left:14px}
 .vc:hover{border-color:var(--dm)}.vc.on{border-color:var(--ac);background:rgba(232,163,23,.06)}.vc.on i{color:var(--ac)!important}
 .tb{flex:1;padding:8px 4px;border-radius:8px;border:2px solid var(--bd);background:var(--c2);color:var(--mt);cursor:pointer;text-align:center;font-size:11px;transition:.3s}
 .tb.on{border-color:var(--wr);color:var(--wr);background:rgba(249,115,22,.06)}
-.cb{width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--ac),#c98a0e);color:#080810;font-size:17px;font-weight:700;cursor:pointer;transition:.3s}
+.tb-ai.on{border-color:var(--ai);color:var(--ai);background:rgba(59,130,246,.06)}
+.cb{width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--ac),#c98a0e);color:#080810;font-size:17px;font-weight:700;cursor:pointer;transition:.3s;position:relative;overflow:hidden}
 .cb:hover{box-shadow:0 6px 25px rgba(232,163,23,.35);transform:translateY(-1px)}
 .cb:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 .rb{display:none}.rb.show{display:block;animation:su .4s ease}
@@ -67,8 +68,6 @@ body.fr .lm,body.en .lm{left:auto;right:8px}
 .sb{position:absolute;left:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:2px solid var(--bd);background:var(--card);color:var(--mt);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;z-index:2}
 body.fr .sb,body.en .sb{left:auto;right:8px}
 .sb:hover{border-color:var(--ac);color:var(--ac)}
-
-/* New Features Styles */
 .ovl{position:fixed;inset:0;background:rgba(8,8,15,.85);backdrop-filter:blur(6px);z-index:2500;display:flex;align-items:center;justify-content:center;padding:20px}
 .mod-c{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.6);animation:su .3s ease}
 .mod-c h3{font-size:18px;margin-bottom:8px;color:var(--fg)}
@@ -103,6 +102,11 @@ body.fr .map-pop-btn,body.en .map-pop-btn{font-family:'Inter',sans-serif}
 .wa-btn{width:100%;margin-top:12px;padding:12px;border-radius:12px;background:#25D366;color:#fff;border:none;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Cairo',sans-serif;transition:.2s}
 body.fr .wa-btn,body.en .wa-btn{font-family:'Inter',sans-serif}
 .wa-btn:hover{background:#1fb855;transform:translateY(-1px)}
+.ai-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:var(--ai);font-size:10px;font-weight:700;letter-spacing:0.5px}
+.fuel-inp{width:100%;padding:12px 14px 12px 40px;border-radius:12px;background:var(--c2);border:2px solid var(--bd);color:var(--fg);font-family:'Cairo',sans-serif;font-size:14px;outline:none;transition:.3s;direction:ltr;text-align:right}
+body.fr .fuel-inp,body.en .fuel-inp{font-family:'Inter',sans-serif}
+.fuel-inp:focus{border-color:var(--ai)}
+.fuel-inp::placeholder{color:var(--dm)}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 @media(max-width:480px){.pb{font-size:36px}}
 </style>
@@ -133,7 +137,6 @@ body.fr .wa-btn,body.en .wa-btn{font-family:'Inter',sans-serif}
 </div>
 </div>
 
-<!-- Favorites -->
 <div class="flex gap-2 mb-3">
 <button class="fav-btn" id="homeBtn" onclick="useFav('home')"><i class="fas fa-house"></i><span id="txHome">المنزل</span></button>
 <button class="fav-btn" id="workBtn" onclick="useFav('work')"><i class="fas fa-briefcase"></i><span id="txWork">الشغل</span></button>
@@ -151,22 +154,34 @@ body.fr .wa-btn,body.en .wa-btn{font-family:'Inter',sans-serif}
 <div class="mb-4"><div class="text-xs font-bold mb-2" style="color:var(--mt)"><i class="fas fa-car ml-1" style="color:var(--ac)"></i><span id="txVeh">نوع المركبة</span></div><div class="flex gap-2 overflow-x-auto pb-1" id="vG"></div></div>
 <div class="mb-4"><div class="text-xs font-bold mb-2" style="color:var(--mt)"><i class="fas fa-traffic-light ml-1" style="color:var(--ac)"></i><span id="txTraf">حالة السير</span></div><div class="flex gap-2" id="tG"></div></div>
 
-<!-- Toggles Area -->
+<!-- AI Dynamic Pricing Section -->
+<div class="p-3 rounded-xl mb-4" style="background:rgba(59,130,246,.03);border:1px solid rgba(59,130,246,.15)">
+<div class="flex items-center justify-between mb-3">
+<div class="text-xs font-bold flex items-center gap-2" style="color:var(--ai)"><i class="fas fa-brain"></i><span id="txAI">معايير الذكاء الاصطناعي</span></div>
+<div class="ai-badge">AI</div>
+</div>
+<div class="relative mb-3">
+<i class="fas fa-gas-pump lic" style="color:var(--ai)!important; left:14px!important; right:auto!important"></i>
+<input type="number" class="fuel-inp" id="fuelInp" placeholder="سعر الوقود اليومي" value="7.05" step="0.01" min="0">
+<span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--dm)">د.م/ل</span>
+</div>
+<div class="text-xs font-bold mb-2" style="color:var(--mt)"><i class="fas fa-chart-line ml-1" style="color:var(--ai)"></i><span id="txDem">العرض والطلب</span></div>
+<div class="flex gap-2" id="dG"></div>
+</div>
+
 <label class="tgl-wrap"><span style="font-size:13px;display:flex;align-items:center;gap:8px"><i class="fas fa-moon" style="color:var(--ac)"></i><span id="txNight">سعر الليل (+50%)</span></span><div class="tgl"><input type="checkbox" id="nightTgl" onchange="S.night=this.checked"><span class="tgl-s"></span></div></label>
 <label class="tgl-wrap" id="tollWrap" style="display:none"><span style="font-size:13px;display:flex;align-items:center;gap:8px"><i class="fas fa-road-barrier" style="color:var(--wr)"></i><span id="txToll">تشمل طريق سيارة (+20 د.م)</span></span><div class="tgl"><input type="checkbox" id="tollTgl" onchange="S.toll=this.checked"><span class="tgl-s"></span></div></label>
 
 <button class="cb" id="calcBtn" disabled><i class="fas fa-bolt ml-2"></i><span id="txCalc">احسب الثمن العادل</span></button>
 <div class="rb mt-4" id="res">
 <div class="rounded-xl p-5" style="background:var(--c2);border:1px solid var(--bd)">
-<div class="text-center mb-4"><div class="text-xs mb-1" style="color:var(--mt)" id="txFP">الثمن العادل للرحلة</div><div class="pb" id="rP">0.00</div><div class="text-sm mt-1" style="color:var(--mt)" id="txMAD">درهم مغربي</div><div class="mt-2"><span class="ft"><i class="fas fa-shield-halved"></i><span id="txFB">ثمن عادل ومنصف</span></span></div></div>
+<div class="text-center mb-4"><div class="text-xs mb-1" style="color:var(--mt)" id="txFP">الثمن العادل للرحلة</div><div class="pb" id="rP">0.00</div><div class="text-sm mt-1" style="color:var(--mt)" id="txMAD">درهم مغربي</div><div class="mt-2 flex items-center justify-center gap-2 flex-wrap"><span class="ft"><i class="fas fa-shield-halved"></i><span id="txFB">ثمن عادل ومنصف</span></span><span class="ai-badge"><i class="fas fa-microchip"></i> AI</span></div></div>
 <div id="rD" class="mb-4"></div><div id="rC"></div>
-<!-- WhatsApp Button -->
 <button class="wa-btn" id="waBtn" onclick="shareWA()"><i class="fab fa-whatsapp" style="font-size:20px"></i><span id="txWa">شارك مع السائق</span></button>
 </div></div>
 </div></div>
 <div class="tm" id="toast"></div>
 
-<!-- Modals -->
 <div class="ovl" id="cfmMod" style="display:none">
 <div class="mod-c">
 <h3 id="cfmTitle">تأكيد الحساب</h3>
@@ -189,15 +204,16 @@ body.fr .wa-btn,body.en .wa-btn{font-family:'Inter',sans-serif}
 
 <script>
 var T={
-ar:{title:'الثمن العادل',sub:'حدد نقاط الرحلة',oPh:'أين أنت الآن؟',dPh:'إلى أين تريد الذهاب؟',dist:'المسافة',km:'كم',dur:'المدة التقريبية',min:'دقيقة',veh:'نوع المركبة',traf:'حالة السير',calc:'احسب الثمن العادل',fp:'الثمن العادل للرحلة',mad:'درهم مغربي',fb:'ثمن عادل ومنصف',cmp:'مقارنة مع المنصات الأخرى',fB:'أجرة الانطلاق',fD:'كلفة المسافة',fF:'تعويض الوقود',fT:'تعويض الزحمة',more:'أكثر بـ',bid:'مجال مضاربة',note:'مع الثمن العادل، توفر',note2:'مقارنة بالذروة المبالغ فيها، وتتجنب المضاربة اللي كتضر بالطرفين.',oL:'انطلاق',eL:'وصول',tC:'تم حساب الثمن العادل',tNR:'لم يتم العثور على مسار',tNN:'خطأ في الاتصال',tLO:'تم تحديد موقعك',tLF:'لم نتمكن من الوصول لموقعك',tLNS:'المتصفح لا يدعم تحديد الموقع',dm:'د.م',cfmT:'تأكيد الحساب',cfmM:'هل تريد حساب الثمن العادل ومحاكاة طلب السائق؟',cfmY:'نعم، ابدأ',srchD:'جاري البحث عن سائق...',srchS:'يرجى الانتظار بينما نبحث عن أقرب سائق لك',cnclS:'إلغاء البحث',night:'سعر الليل (+50%)',toll:'تشمل طريق سيارة (+20 د.م)',home:'المنزل',work:'الشغل',tFS:'تم الحفظ كمكان مفضل',tNF:'حدد نقطة الانطلاق أولاً حتى نتمكن من الحفظ',wa:'شارك مع السائق',mapO:'اختر كنقطة انطلاق',mapD:'اختر كوجهة',v:{car:'سيارة',taxi:'أجرة',moto:'نارية',mini:'حافلة',van:'شاحنة',tuk:'توك توك'},tr:{l:'خفيف',m:'متوسط',h:'مزدحم',vh:'مزدحم جداً'},ln:'العربية',sl:'ar'},
-fr:{title:'Le Prix Juste',sub:'Définissez les points du trajet',oPh:'Où êtes-vous ?',dPh:'Où allez-vous ?',dist:'Distance',km:'km',dur:'Durée estimée',min:'min',veh:'Type de véhicule',traf:'État du trafic',calc:'Calculer le prix juste',fp:'Prix juste du trajet',mad:'Dirham marocain',fb:'Prix juste et équitable',cmp:'Comparaison avec autres plateformes',fB:'Tarif de départ',fD:'Coût de la distance',fF:'Compensation carburant',fT:'Compensation trafic',more:'Plus de',bid:'Fourchette de négociation',note:'Avec le prix juste, vous économisez',note2:"par rapport aux prix de pointe, et vous évitez la surenchère.",oL:'Départ',eL:'Arrivée',tC:'Prix juste calculé',tNR:'Aucun itinéraire trouvé',tNN:'Erreur de connexion',tLO:'Position détectée',tLF:"Impossible d'accéder à votre position",tLNS:'Géolocalisation non supportée',dm:'DH',cfmT:'Confirmer le calcul',cfmM:'Voulez-vous calculer le prix juste et simuler la recherche ?',cfmY:'Oui, commencer',srchD:'Recherche de chauffeur...',srchS:'Veuillez patienter pendant que nous trouvons un chauffeur',cnclS:'Annuler',night:'Tarif de nuit (+50%)',toll:'Inclure péage (+20 DH)',home:'Maison',work:'Travail',tFS:'Enregistré comme favori',tNF:'Définissez le départ pour pouvoir enregistrer',wa:'Partager avec le chauffeur',mapO:'Définir comme départ',mapD:'Définir comme arrivée',v:{car:'Voiture',taxi:'Taxi',moto:'Moto',mini:'Minibus',van:'Camionnette',tuk:'Tuk-tuk'},tr:{l:'Fluide',m:'Modéré',h:'Dense',vh:'Très dense'},ln:'Français',sl:'fr'},
-en:{title:'Fair Price',sub:'Set your trip points',oPh:'Where are you now?',dPh:'Where do you want to go?',dist:'Distance',km:'km',dur:'Estimated time',min:'min',veh:'Vehicle type',traf:'Traffic status',calc:'Calculate Fair Price',fp:'Fair price for the trip',mad:'Moroccan Dirham',fb:'Fair and equitable price',cmp:'Comparison with other platforms',fB:'Base fare',fD:'Distance cost',fF:'Fuel compensation',fT:'Traffic compensation',more:'More by',bid:'Bidding range',note:'With Fair Price, you save',note2:'compared to surge pricing, and avoid bidding that hurts both parties.',oL:'Start',eL:'End',tC:'Fair price calculated',tNR:'No route found',tNN:'Connection error',tLO:'Location detected',tLF:'Could not access your location',tLNS:'Geolocation not supported',dm:'DH',cfmT:'Confirm Calculation',cfmM:'Do you want to calculate the fair price and simulate finding a driver?',cfmY:'Yes, start',srchD:'Searching for driver...',srchS:'Please wait while we find the nearest driver',cnclS:'Cancel search',night:'Night Price (+50%)',toll:'Include Toll Road (+20 DH)',home:'Home',work:'Work',tFS:'Saved as favorite',tNF:'Set an origin point first to save',wa:'Share with driver',mapO:'Set as Start',mapD:'Set as End',v:{car:'Car',taxi:'Taxi',moto:'Moto',mini:'Minibus',van:'Van',tuk:'Tuk-tuk'},tr:{l:'Light',m:'Moderate',h:'Heavy',vh:'Very heavy'},ln:'English',sl:'en'}
+ar:{title:'الثمن العادل',sub:'حدد نقاط الرحلة',oPh:'أين أنت الآن؟',dPh:'إلى أين تريد الذهاب؟',dist:'المسافة',km:'كم',dur:'المدة التقريبية',min:'دقيقة',veh:'نوع المركبة',traf:'حالة السير',calc:'احسب الثمن العادل',fp:'الثمن العادل للرحلة',mad:'درهم مغربي',fb:'ثمن عادل ومنصف',cmp:'مقارنة مع المنصات الأخرى',fB:'أجرة الانطلاق',fD:'كلفة المسافة',fF:'تعويض وقود اليوم',fT:'تعويض الزحمة',fS:'معامل الطلب',more:'أكثر بـ',bid:'مجال مضاربة',note:'بفضل الذكاء الاصطناعي، وفرت',note2:'مقارنة بالتطبيقات التقليدية، بدون مبالغة ولا مفاوضة.',oL:'انطلاق',eL:'وصول',tC:'تم حساب الثمن العادل',tNR:'لم يتم العثور على مسار',tNN:'خطأ في الاتصال',tLO:'تم تحديد موقعك',tLF:'لم نتمكن من الوصول لموقعك',tLNS:'المتصفح لا يدعم تحديد الموقع',dm:'د.م',cfmT:'تأكيد الحساب',cfmM:'هل تريد حساب الثمن العادل ومحاكاة طلب السائق؟',cfmY:'نعم، ابدأ',srchD:'جاري البحث عن سائق...',srchS:'يرجى الانتظار بينما نبحث عن أقرب سائق لك',cnclS:'إلغاء البحث',night:'سعر الليل (+50%)',toll:'تشمل طريق سيارة (+20 د.م)',home:'المنزل',work:'الشغل',tFS:'تم الحفظ كمكان مفضل',tNF:'حدد نقطة الانطلاق أولاً حتى نتمكن من الحفظ',wa:'شارك مع السائق',mapO:'اختر كنقطة انطلاق',mapD:'اختر كوجهة',ai:'معايير الذكاء الاصطناعي',dem:'العرض والطلب',v:{car:'سيارة',taxi:'أجرة',moto:'نارية',mini:'حافلة',van:'شاحنة',tuk:'توك توك'},tr:{l:'خفيف',m:'متوسط',h:'مزدحم',vh:'مزدحم جداً'},dr:{n:'عادي',hd:'طلب مرتفع',ls:'عرض قليل'},ln:'العربية',sl:'ar'},
+fr:{title:'Le Prix Juste',sub:'Définissez les points du trajet',oPh:'Où êtes-vous ?',dPh:'Où allez-vous ?',dist:'Distance',km:'km',dur:'Durée estimée',min:'min',veh:'Type de véhicule',traf:'État du trafic',calc:'Calculer le prix juste',fp:'Prix juste du trajet',mad:'Dirham marocain',fb:'Prix juste et équitable',cmp:'Comparaison avec autres plateformes',fB:'Tarif de départ',fD:'Coût de la distance',fF:'Compensation carburant jour',fT:'Compensation trafic',fS:'Facteur demande',more:'Plus de',bid:'Fourchette de négociation',note:'Grâce à l\'IA, vous économisez',note2:"par rapport aux apps traditionnelles, sans abus ni négociation.",oL:'Départ',eL:'Arrivée',tC:'Prix juste calculé',tNR:'Aucun itinéraire trouvé',tNN:'Erreur de connexion',tLO:'Position détectée',tLF:"Impossible d'accéder à votre position",tLNS:'Géolocalisation non supportée',dm:'DH',cfmT:'Confirmer le calcul',cfmM:'Voulez-vous calculer le prix juste et simuler la recherche ?',cfmY:'Oui, commencer',srchD:'Recherche de chauffeur...',srchS:'Veuillez patienter pendant la recherche',cnclS:'Annuler',night:'Tarif de nuit (+50%)',toll:'Inclure péage (+20 DH)',home:'Maison',work:'Travail',tFS:'Enregistré comme favori',tNF:'Définissez le départ pour enregistrer',wa:'Partager avec le chauffeur',mapO:'Définir comme départ',mapD:'Définir comme arrivée',ai:'Critères Intelligence Artificielle',dem:'Offre et Demande',v:{car:'Voiture',taxi:'Taxi',moto:'Moto',mini:'Minibus',van:'Camionnette',tuk:'Tuk-tuk'},tr:{l:'Fluide',m:'Modéré',h:'Dense',vh:'Très dense'},dr:{n:'Normal',hd:'Forte demande',ls:'Faible offre'},ln:'Français',sl:'fr'},
+en:{title:'Fair Price',sub:'Set your trip points',oPh:'Where are you now?',dPh:'Where do you want to go?',dist:'Distance',km:'km',dur:'Estimated time',min:'min',veh:'Vehicle type',traf:'Traffic status',calc:'Calculate Fair Price',fp:'Fair price for the trip',mad:'Moroccan Dirham',fb:'Fair and equitable price',cmp:'Comparison with other platforms',fB:'Base fare',fD:'Distance cost',fF:'Daily fuel comp.',fT:'Traffic comp.',fS:'Demand factor',more:'More by',bid:'Bidding range',note:'Thanks to AI, you save',note2:'compared to traditional apps, without surge or haggling.',oL:'Start',eL:'End',tC:'Fair price calculated',tNR:'No route found',tNN:'Connection error',tLO:'Location detected',tLF:'Could not access your location',tLNS:'Geolocation not supported',dm:'DH',cfmT:'Confirm Calculation',cfmM:'Do you want to calculate the fair price and simulate finding a driver?',cfmY:'Yes, start',srchD:'Searching for driver...',srchS:'Please wait while we find a driver',cnclS:'Cancel search',night:'Night Price (+50%)',toll:'Include Toll Road (+20 DH)',home:'Home',work:'Work',tFS:'Saved as favorite',tNF:'Set an origin point first to save',wa:'Share with driver',mapO:'Set as Start',mapD:'Set as End',ai:'AI Pricing Criteria',dem:'Supply & Demand',v:{car:'Car',taxi:'Taxi',moto:'Moto',mini:'Minibus',van:'Van',tuk:'Tuk-tuk'},tr:{l:'Light',m:'Moderate',h:'Heavy',vh:'Very heavy'},dr:{n:'Normal',hd:'High demand',ls:'Low supply'},ln:'English',sl:'en'}
 };
 var VH=[{id:'car',ic:'fa-car',r:3.5,c:7},{id:'taxi',ic:'fa-taxi',r:2,c:7},{id:'moto',ic:'fa-motorcycle',r:1.5,c:3},{id:'mini',ic:'fa-van-shuttle',r:5,c:15},{id:'van',ic:'fa-truck',r:6,c:12},{id:'tuk',ic:'fa-truck-pickup',r:1,c:2.5}];
 var TR=[{id:'l',m:1},{id:'m',m:1.15},{id:'h',m:1.35},{id:'vh',m:1.6}];
-var lang='ar',S={o:null,d:null,v:'car',t:'m',dist:0,night:false,toll:false}, searchTimeout;
+var DR=[{id:'n',m:1},{id:'hd',m:1.2},{id:'ls',m:1.4}]; // AI Supply/Demand
+var lang='ar',S={o:null,d:null,v:'car',t:'m',dmd:'n',dist:0,night:false,toll:false}, searchTimeout;
 function tx(k){return T[lang][k]||k}
-function setL(l){lang=l;var h=document.documentElement;if(l==='ar'){h.setAttribute('dir','rtl');h.setAttribute('lang','ar');document.body.className='';}else{h.setAttribute('dir','ltr');h.setAttribute('lang',l);document.body.className=l;}document.getElementById('lLbl').textContent=T[l].ln;document.querySelectorAll('.lo').forEach(function(b){b.classList.toggle('on',b.dataset.l===l);});document.getElementById('txTitle').textContent=tx('title');document.getElementById('txSub').textContent=tx('sub');document.getElementById('oInp').placeholder=tx('oPh');document.getElementById('dInp').placeholder=tx('dPh');document.getElementById('txDist').textContent=tx('dist');document.getElementById('txKm').textContent=tx('km');document.getElementById('txDur').textContent=tx('dur');document.getElementById('txMin').textContent=tx('min');document.getElementById('txVeh').textContent=tx('veh');document.getElementById('txTraf').textContent=tx('traf');document.getElementById('txCalc').textContent=tx('calc');document.getElementById('txFP').textContent=tx('fp');document.getElementById('txMAD').textContent=tx('mad');document.getElementById('txFB').textContent=tx('fb');document.getElementById('txNight').textContent=tx('night');document.getElementById('txToll').textContent=tx('toll');document.getElementById('txHome').textContent=tx('home');document.getElementById('txWork').textContent=tx('work');document.getElementById('txWa').textContent=tx('wa');renderV();renderT();if(document.getElementById('res').classList.contains('show')&&S.dist>0)renderRC(calc());document.getElementById('lm').classList.remove('show');}
+function setL(l){lang=l;var h=document.documentElement;if(l==='ar'){h.setAttribute('dir','rtl');h.setAttribute('lang','ar');document.body.className='';}else{h.setAttribute('dir','ltr');h.setAttribute('lang',l);document.body.className=l;}document.getElementById('lLbl').textContent=T[l].ln;document.querySelectorAll('.lo').forEach(function(b){b.classList.toggle('on',b.dataset.l===l);});document.getElementById('txTitle').textContent=tx('title');document.getElementById('txSub').textContent=tx('sub');document.getElementById('oInp').placeholder=tx('oPh');document.getElementById('dInp').placeholder=tx('dPh');document.getElementById('txDist').textContent=tx('dist');document.getElementById('txKm').textContent=tx('km');document.getElementById('txDur').textContent=tx('dur');document.getElementById('txMin').textContent=tx('min');document.getElementById('txVeh').textContent=tx('veh');document.getElementById('txTraf').textContent=tx('traf');document.getElementById('txCalc').textContent=tx('calc');document.getElementById('txFP').textContent=tx('fp');document.getElementById('txMAD').textContent=tx('mad');document.getElementById('txFB').textContent=tx('fb');document.getElementById('txNight').textContent=tx('night');document.getElementById('txToll').textContent=tx('toll');document.getElementById('txHome').textContent=tx('home');document.getElementById('txWork').textContent=tx('work');document.getElementById('txWa').textContent=tx('wa');document.getElementById('txAI').textContent=tx('ai');document.getElementById('txDem').textContent=tx('dem');renderV();renderT();renderD();if(document.getElementById('res').classList.contains('show')&&S.dist>0)renderRC(calc());document.getElementById('lm').classList.remove('show');}
 document.addEventListener('click',function(e){if(!document.getElementById('lBtn').contains(e.target)&&!document.getElementById('lm').contains(e.target))document.getElementById('lm').classList.remove('show');});
 var map=L.map('map',{center:[33.9716,-6.8498],zoom:13,zoomControl:false,attributionControl:false});
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
@@ -205,132 +221,37 @@ var oM=null,dM=null,rL=null;
 function mkI(tp){var c=tp==='o'?'pin-o':'pin-e',lb=tp==='o'?tx('oL'):tx('eL');return L.divIcon({className:'',html:'<div class="pin '+c+'"><div class="pin-d"></div><div class="pin-l">'+lb+'</div></div>',iconSize:[40,44],iconAnchor:[20,44]});}
 function setO(la,ln,nm){S.o={la:la,ln:ln,nm:nm||tx('oL')};if(oM)map.removeLayer(oM);oM=L.marker([la,ln],{icon:mkI('o'),draggable:true}).addTo(map);oM.on('dragend',function(e){var p=e.target.getLatLng();revG(p.lat,p.lng,function(n){S.o.nm=n;document.getElementById('oInp').value=n;});upR();});document.getElementById('oInp').value=S.o.nm;upR();}
 function setD(la,ln,nm){S.d={la:la,ln:ln,nm:nm||tx('eL')};if(dM)map.removeLayer(dM);dM=L.marker([la,ln],{icon:mkI('d'),draggable:true}).addTo(map);dM.on('dragend',function(e){var p=e.target.getLatLng();revG(p.lat,p.lng,function(n){S.d.nm=n;document.getElementById('dInp').value=n;});upR();});document.getElementById('dInp').value=S.d.nm;upR();}
-
-// Feature 2: Tap on Map
-map.on('click', function(e) {
-    var la = e.latlng.lat, ln = e.latlng.lng;
-    var pop = L.popup({closeButton: true, className: 'dark-pop'})
-        .setLatLng(e.latlng)
-        .setContent(`<div style="display:flex;gap:8px;padding:4px 0;">
-            <button class="map-pop-btn" style="background:var(--ok);flex:1" onclick="pickMap(${la},${ln},'o')">${tx('mapO')}</button>
-            <button class="map-pop-btn" style="background:var(--no);flex:1" onclick="pickMap(${la},${ln},'d')">${tx('mapD')}</button>
-        </div>`)
-        .openOn(map);
-});
-function pickMap(la, ln, type) {
-    map.closePopup();
-    revG(la, ln, function(nm) {
-        if(type === 'o') { setO(la, ln, nm); map.setView([la, ln], Math.max(map.getZoom(), 15)); }
-        else { setD(la, ln, nm); map.setView([la, ln], Math.max(map.getZoom(), 15)); }
-    });
-}
-
+map.on('click', function(e) {var la = e.latlng.lat, ln = e.latlng.lng;var pop = L.popup({closeButton: true, className: 'dark-pop'}).setLatLng(e.latlng).setContent('<div style="display:flex;gap:8px;padding:4px 0;"><button class="map-pop-btn" style="background:var(--ok);flex:1" onclick="pickMap('+la+','+ln+',\'o\')">'+tx('mapO')+'</button><button class="map-pop-btn" style="background:var(--no);flex:1" onclick="pickMap('+la+','+ln+',\'d\')">'+tx('mapD')+'</button></div>').openOn(map);});
+function pickMap(la, ln, type) {map.closePopup();revG(la, ln, function(nm) {if(type === 'o') {setO(la, ln, nm); map.setView([la, ln], Math.max(map.getZoom(), 15));} else {setD(la, ln, nm); map.setView([la, ln], Math.max(map.getZoom(), 15));}});}
 var sT=null;
 function srch(q,cb){if(!q||q.length<2){cb([]);return;}var sfx=lang==='fr'?' Maroc':lang==='en'?' Morocco':' المغرب';fetch('https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(q.indexOf('المغرب')>-1||q.indexOf('Maroc')>-1||q.indexOf('Morocco')>-1?q:q+sfx)+'&accept-language='+T[lang].sl+'&limit=5&countrycodes=ma').then(function(r){return r.json();}).then(function(d){cb(d);}).catch(function(){cb([]);});}
 function revG(la,ln,cb){fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+la+'&lon='+ln+'&accept-language='+T[lang].sl).then(function(r){return r.json();}).then(function(d){cb(d.display_name?d.display_name.split(',').slice(0,3).join(','):la.toFixed(4)+', '+ln.toFixed(4));}).catch(function(){cb(la.toFixed(4)+', '+ln.toFixed(4));});}
 function setupS(iid,sid,fn){var inp=document.getElementById(iid),sg=document.getElementById(sid);inp.addEventListener('input',function(){clearTimeout(sT);var q=this.value.trim();if(q.length<2){sg.classList.remove('show');return;}sT=setTimeout(function(){srch(q,function(res){if(!res.length){sg.classList.remove('show');return;}sg.innerHTML=res.map(function(r){var sn=r.display_name.split(',').slice(0,3).join(',');return'<div class="si" data-la="'+r.lat+'" data-lo="'+r.lon+'" data-n="'+sn+'"><i class="fas fa-location-dot"></i><span>'+sn+'</span></div>';}).join('');sg.classList.add('show');sg.querySelectorAll('.si').forEach(function(it){it.addEventListener('click',function(){inp.value=this.dataset.n;sg.classList.remove('show');fn(parseFloat(this.dataset.la),parseFloat(this.dataset.lo),this.dataset.n);map.setView([parseFloat(this.dataset.la),parseFloat(this.dataset.lo)],Math.max(map.getZoom(),14));});});});},350);});inp.addEventListener('focus',function(){if(sg.children.length)sg.classList.add('show');});document.addEventListener('click',function(e){if(!inp.contains(e.target)&&!sg.contains(e.target))sg.classList.remove('show');});}
 setupS('oInp','oSg',setO);setupS('dInp','dSg',setD);
 function swap(){if(!S.o&&!S.d)return;var tmp=S.o;S.o=S.d;S.d=tmp;document.getElementById('oInp').value=S.o?S.o.nm:'';document.getElementById('dInp').value=S.d?S.d.nm:'';if(oM){map.removeLayer(oM);oM=null;}if(dM){map.removeLayer(dM);dM=null;}if(rL){map.removeLayer(rL);rL=null;}if(S.o)setO(S.o.la,S.o.ln,S.o.nm);if(S.d)setD(S.d.la,S.d.ln,S.d.nm);upR();}
-function upR(){var btn=document.getElementById('calcBtn'),info=document.getElementById('tripInfo');if(!S.o||!S.d){btn.disabled=true;info.style.display='none';document.getElementById('tollWrap').style.display='none';if(rL){map.removeLayer(rL);rL=null;}return;}sLd(30);fetch('https://router.project-osrm.org/route/v1/driving/'+S.o.ln+','+S.o.la+';'+S.d.ln+','+S.d.la+'?overview=full&geometries=geojson').then(function(r){return r.json();}).then(function(data){hLd();if(data.code!=='Ok'||!data.routes.length){tst('tNR','wr');btn.disabled=true;info.style.display='none';return;}var route=data.routes[0];var coords=route.geometry.coordinates.map(function(c){return[c[1],c[0]];});S.dist=Math.round(route.distance/10)/100;if(rL)map.removeLayer(rL);rL=L.polyline(coords,{color:'#e8a317',weight:4,opacity:0.85,smoothFactor:1}).addTo(map);map.fitBounds(rL.getBounds(),{padding:[60,60]});info.style.display='flex';document.getElementById('iDist').textContent=S.dist.toFixed(1);document.getElementById('iTime').textContent=Math.round(route.duration/60);btn.disabled=false;
-// Feature 5: Show Toll if > 30km
-document.getElementById('tollWrap').style.display = S.dist > 30 ? 'flex' : 'none';
-}).catch(function(){hLd();tst('tNN','no');});}
+function upR(){var btn=document.getElementById('calcBtn'),info=document.getElementById('tripInfo');if(!S.o||!S.d){btn.disabled=true;info.style.display='none';document.getElementById('tollWrap').style.display='none';if(rL){map.removeLayer(rL);rL=null;}return;}sLd(30);fetch('https://router.project-osrm.org/route/v1/driving/'+S.o.ln+','+S.o.la+';'+S.d.ln+','+S.d.la+'?overview=full&geometries=geojson').then(function(r){return r.json();}).then(function(data){hLd();if(data.code!=='Ok'||!data.routes.length){tst('tNR','wr');btn.disabled=true;info.style.display='none';return;}var route=data.routes[0];var coords=route.geometry.coordinates.map(function(c){return[c[1],c[0]];});S.dist=Math.round(route.distance/10)/100;if(rL)map.removeLayer(rL);rL=L.polyline(coords,{color:'#e8a317',weight:4,opacity:0.85,smoothFactor:1}).addTo(map);map.fitBounds(rL.getBounds(),{padding:[60,60]});info.style.display='flex';document.getElementById('iDist').textContent=S.dist.toFixed(1);document.getElementById('iTime').textContent=Math.round(route.duration/60);btn.disabled=false;document.getElementById('tollWrap').style.display=S.dist>30?'flex':'none';}).catch(function(){hLd();tst('tNN','no');});}
 function goMe(){sLd(50);if('geolocation' in navigator){navigator.geolocation.getCurrentPosition(function(pos){hLd();var la=pos.coords.latitude,ln=pos.coords.longitude;map.setView([la,ln],15);revG(la,ln,function(n){setO(la,ln,n);tst('tLO','ok');});},function(){hLd();tst('tLF','wr');},{enableHighAccuracy:true,timeout:8000});}else{hLd();tst('tLNS','wr');}}
 var sheet=document.getElementById('sheet'),sCol=true;
 document.getElementById('sheetH').addEventListener('click',function(){sCol=!sCol;sheet.classList.toggle('col',sCol);});
 function expSh(){sCol=false;sheet.classList.remove('col');}
 function renderV(){document.getElementById('vG').innerHTML=VH.map(function(v){var nm=tx('v')[v.id],on=S.v===v.id;return'<div class="vc'+(on?' on':'')+'" data-v="'+v.id+'" tabindex="0"><i class="fas '+v.ic+' text-lg mb-1" style="color:'+(on?'var(--ac)':'var(--mt)')+'"></i><div style="font-size:11px;font-weight:600">'+nm+'</div><div style="font-size:10px;color:var(--dm)">'+v.r+' '+tx('dm')+'/km</div></div>';}).join('');document.querySelectorAll('.vc').forEach(function(c){c.addEventListener('click',function(){S.v=this.dataset.v;renderV();});});}
 function renderT(){var tn=tx('tr');document.getElementById('tG').innerHTML=TR.map(function(t){return'<button class="tb'+(S.t===t.id?' on':'')+'" data-tid="'+t.id+'">'+tn[t.id]+'<div style="font-size:9px;color:var(--dm)">x'+t.m+'</div></button>';}).join('');document.querySelectorAll('.tb').forEach(function(b){b.addEventListener('click',function(){S.t=this.dataset.tid;renderT();});});}
-function calc(){var v=VH.find(function(x){return x.id===S.v;}),tr=TR.find(function(x){return x.id===S.t;}),dist=S.dist,fp=14.5,bF=5,dC=dist*v.r,fC=dist*(v.c/100)*fp*0.3,tC=(bF+dC)*(tr.m-1),fair=Math.round((bF+dC+fC+tC)*100)/100,surge=1.5+(tr.m>1?(tr.m-1)*1.8:0),careem=Math.round(fair*surge*100)/100,inL=Math.round(fair*0.72*100)/100,inH=Math.round(fair*1.28*100)/100;
-// Feature 1 & 5: Apply Night and Toll multipliers
-if(S.toll) { fair += 20; careem += 20; inL += 20; inH += 20; }
-if(S.night) { fair = Math.round(fair*1.5*100)/100; careem = Math.round(careem*1.5*100)/100; inL = Math.round(inL*1.5*100)/100; inH = Math.round(inH*1.5*100)/100; }
-return{fair:fair,bd:{b:Math.round(bF*100)/100,d:Math.round(dC*100)/100,f:Math.round(fC*100)/100,t:Math.round(tC*100)/100},careem:careem,inL:inL,inH:inH};}
-function renderRC(r){var dm=tx('dm');document.getElementById('rD').innerHTML=[['fB',r.bd.b,'fa-flag','#8b8baa'],['fD',r.bd.d,'fa-road','var(--ac)'],['fF',r.bd.f,'fa-gas-pump','var(--wr)'],['fT',r.bd.t,'fa-traffic-light','var(--no)']].map(function(x){return'<div class="dr"><span style="color:var(--mt)"><i class="fas '+x[2]+' ml-2" style="color:'+x[3]+';font-size:11px"></i>'+tx(x[0])+'</span><span class="font-bold" style="font-variant-numeric:tabular-nums">'+x[1].toFixed(2)+' '+dm+'</span></div>';}).join('');var mx=Math.max(r.fair,r.careem,r.inH,1),fP=(r.fair/mx*100).toFixed(0),cP=(r.careem/mx*100).toFixed(0),iHP=(r.inH/mx*100).toFixed(0),iLP=(r.inL/mx*100).toFixed(0),sv=Math.round(((r.careem-r.fair)/r.careem)*100);document.getElementById('rC').innerHTML='<div class="text-xs font-bold mb-3" style="color:var(--mt)"><i class="fas fa-chart-bar ml-1" style="color:var(--ac)"></i>'+tx('cmp')+'</div><div class="mb-3"><div class="flex justify-between mb-1"><span class="text-xs"><span class="inline-block w-2 h-2 rounded-full ml-1" style="background:var(--ok)"></span>'+tx('title')+'</span><span class="text-xs font-bold" style="color:var(--ok)">'+r.fair.toFixed(2)+' '+dm+'</span></div><div class="cbar"><div class="cfill" style="background:var(--ok);width:0" data-w="'+fP+'%"></div></div></div><div class="mb-3"><div class="flex justify-between mb-1"><span class="text-xs"><span class="inline-block w-2 h-2 rounded-full ml-1" style="background:var(--no)"></span>Careem</span><span class="text-xs font-bold" style="color:var(--no)">'+r.careem.toFixed(2)+' '+dm+'</span></div><div class="cbar"><div class="cfill" style="background:var(--no);width:0" data-w="'+cP+'%"></div></div><div class="text-xs mt-1" style="color:var(--no);opacity:.8">'+tx('more')+' '+sv+'%</div></div><div class="mb-3"><div class="flex justify-between mb-1"><span class="text-xs"><span class="inline-block w-2 h-2 rounded-full ml-1" style="background:var(--wr)"></span>InDrive</span><span class="text-xs font-bold" style="color:var(--wr)">'+r.inL.toFixed(0)+' — '+r.inH.toFixed(0)+' '+dm+'</span></div><div class="cbar" style="position:relative"><div class="cfill" style="background:rgba(249,115,22,.5);width:0" data-w="'+iHP+'%"></div><div style="position:absolute;top:0;height:100%;width:2px;background:var(--wr);left:'+iLP+'%;border-radius:1px"></div></div><div class="text-xs mt-1" style="color:var(--wr);opacity:.8">'+tx('bid')+': '+r.inL.toFixed(0)+' — '+r.inH.toFixed(0)+' '+dm+'</div></div><div class="mt-3 p-3 rounded-lg" style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.15)"><div class="flex items-start gap-2"><i class="fas fa-circle-check mt-0.5" style="color:var(--ok);font-size:13px"></i><span class="text-xs" style="color:var(--mt);line-height:1.7">'+tx('note')+' <b style="color:var(--no)">'+sv+'%</b> '+tx('note2')+'</span></div></div>';setTimeout(function(){document.querySelectorAll('#rC .cfill').forEach(function(b){b.style.width=b.dataset.w;});},300);}
+function renderD(){var dn=tx('dr');document.getElementById('dG').innerHTML=DR.map(function(d){return'<button class="tb tb-ai'+(S.dmd===d.id?' on':'')+'" data-did="'+d.id+'">'+dn[d.id]+'<div style="font-size:9px;color:var(--dm)">x'+d.m+'</div></button>';}).join('');document.querySelectorAll('.tb-ai').forEach(function(b){b.addEventListener('click',function(){S.dmd=this.dataset.did;renderD();});});}
+function calc(){var v=VH.find(function(x){return x.id===S.v;}),tr=TR.find(function(x){return x.id===S.t;}),dr=DR.find(function(x){return x.id===S.dmd;}),dist=S.dist,fuel=parseFloat(document.getElementById('fuelInp').value)||7.05,bF=5,dC=dist*v.r,fC=(dist*(v.c/100)*fuel)*0.3,tC=(bF+dC)*(tr.m-1),sC=(bF+dC)*(dr.m-1),fair=Math.round((bF+dC+fC+tC+sC)*100)/100,surge=1.5+(tr.m>1?(tr.m-1)*1.8:0),careem=Math.round(fair*surge*100)/100,inL=Math.round(fair*0.72*100)/100,inH=Math.round(fair*1.28*100)/100;if(S.toll){fair+=20;careem+=20;inL+=20;inH+=20;}if(S.night){fair=Math.round(fair*1.5*100)/100;careem=Math.round(careem*1.5*100)/100;inL=Math.round(inL*1.5*100)/100;inH=Math.round(inH*1.5*100)/100;}return{fair:fair,bd:{b:Math.round(bF*100)/100,d:Math.round(dC*100)/100,f:Math.round(fC*100)/100,t:Math.round(tC*100)/100,s:Math.round(sC*100)/100},careem:careem,inL:inL,inH:inH};}
+function renderRC(r){var dm=tx('dm');document.getElementById('rD').innerHTML=[['fB',r.bd.b,'fa-flag','#8b8baa'],['fD',r.bd.d,'fa-road','var(--ac)'],['fF',r.bd.f,'fa-gas-pump','var(--ai)'],['fT',r.bd.t,'fa-traffic-light','var(--wr)'],['fS',r.bd.s,'fa-chart-line','var(--ai)']].map(function(x){return'<div class="dr"><span style="color:var(--mt)"><i class="fas '+x[2]+' ml-2" style="color:'+x[3]+';font-size:11px"></i>'+tx(x[0])+'</span><span class="font-bold" style="font-variant-numeric:tabular-nums">'+x[1].toFixed(2)+' '+dm+'</span></div>';}).join('');var mx=Math.max(r.fair,r.careem,r.inH,1),fP=(r.fair/mx*100).toFixed(0),cP=(r.careem/mx*100).toFixed(0),iHP=(r.inH/mx*100).toFixed(0),iLP=(r.inL/mx*100).toFixed(0),sv=Math.round(((r.careem-r.fair)/r.careem)*100);document.getElementById('rC').innerHTML='<div class="text-xs font-bold mb-3" style="color:var(--mt)"><i class="fas fa-chart-bar ml-1" style="color:var(--ac)"></i>'+tx('cmp')+'</div><div class="mb-3"><div class="flex justify-between mb-1"><span class="text-xs"><span class="inline-block w-2 h-2 rounded-full ml-1" style="background:var(--ok)"></span>'+tx('title')+'</span><span class="text-xs font-bold" style="color:var(--ok)">'+r.fair.toFixed(2)+' '+dm+'</span></div><div class="cbar"><div class="cfill" style="background:var(--ok);width:0" data-w="'+fP+'%"></div></div></div><div class="mb-3"><div class="flex justify-between mb-1"><span class="text-xs"><span class="inline-block w-2 h-2 rounded-full ml-1" style="background:var(--no)"></span>Careem</span><span class="text-xs font-bold" style="color:var(--no)">'+r.careem.toFixed(2)+' '+dm+'</span></div><div class="cbar"><div class="cfill" style="background:var(--no);width:0" data-w="'+cP+'%"></div></div><div class="text-xs mt-1" style="color:var(--no);opacity:.8">'+tx('more')+' '+sv+'%</div></div><div class="mb-3"><div class="flex justify-between mb-1"><span class="text-xs"><span class="inline-block w-2 h-2 rounded-full ml-1" style="background:var(--wr)"></span>InDrive</span><span class="text-xs font-bold" style="color:var(--wr)">'+r.inL.toFixed(0)+' — '+r.inH.toFixed(0)+' '+dm+'</span></div><div class="cbar" style="position:relative"><div class="cfill" style="background:rgba(249,115,22,.5);width:0" data-w="'+iHP+'%"></div><div style="position:absolute;top:0;height:100%;width:2px;background:var(--wr);left:'+iLP+'%;border-radius:1px"></div></div><div class="text-xs mt-1" style="color:var(--wr);opacity:.8">'+tx('bid')+': '+r.inL.toFixed(0)+' — '+r.inH.toFixed(0)+' '+dm+'</div></div><div class="mt-3 p-3 rounded-lg" style="background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.15)"><div class="flex items-start gap-2"><i class="fas fa-brain mt-0.5" style="color:var(--ai);font-size:13px"></i><span class="text-xs" style="color:var(--mt);line-height:1.7">'+tx('note')+' <b style="color:var(--no)">'+sv+'%</b> '+tx('note2')+'</span></div></div>';setTimeout(function(){document.querySelectorAll('#rC .cfill').forEach(function(b){b.style.width=b.dataset.w;});},300);}
 function showRes(r){var res=document.getElementById('res');res.classList.add('show');var pEl=document.getElementById('rP'),t0=performance.now();(function tk(now){var p=Math.min((now-t0)/800,1);pEl.textContent=(r.fair*(1-Math.pow(1-p,3))).toFixed(2);if(p<1)requestAnimationFrame(tk);})(t0);renderRC(r);expSh();setTimeout(function(){res.scrollIntoView({behavior:'smooth',block:'nearest'});},500);}
 function sLd(p){document.getElementById('loadFill').style.width=p+'%';document.getElementById('loadBar').style.opacity='1';}
 function hLd(){var f=document.getElementById('loadFill');f.style.width='100%';setTimeout(function(){document.getElementById('loadBar').style.opacity='0';f.style.width='0%';},400);}
 function tst(k,tp){var ic={ok:'fa-check-circle',wr:'fa-triangle-exclamation',no:'fa-wifi'},cl={ok:'var(--ok)',wr:'var(--wr)',no:'var(--no)'},el=document.getElementById('toast');el.innerHTML='<i class="fas '+(ic[tp]||ic.wr)+'" style="color:'+(cl[tp]||cl.wr)+';margin-left:8px"></i>'+tx(k);el.classList.add('show');setTimeout(function(){el.classList.remove('show');},3500);}
-
-// Feature 2: LocalStorage Logic
-function saveTrip() {
-    if(S.o && S.d && S.dist > 0) {
-        localStorage.setItem('lastFairPriceTrip', JSON.stringify({
-            o: S.o, d: S.d, v: S.v, t: S.t, night: S.night, toll: S.toll
-        }));
-    }
-}
-function loadLastTrip() {
-    try {
-        var data = JSON.parse(localStorage.getItem('lastFairPriceTrip'));
-        if(data && data.o && data.d) {
-            S.v = data.v || 'car'; S.t = data.t || 'm'; S.night = data.night || false; S.toll = data.toll || false;
-            renderV(); renderT();
-            document.getElementById('nightTgl').checked = S.night;
-            document.getElementById('tollTgl').checked = S.toll;
-            setO(data.o.la, data.o.ln, data.o.nm);
-            setD(data.d.la, data.d.ln, data.d.nm);
-        }
-    } catch(e) {}
-}
-
-// Feature 4: Favorites Logic
-function useFav(type) {
-    var saved = localStorage.getItem('fp_'+type);
-    if (saved) {
-        var d = JSON.parse(saved);
-        setO(d.la, d.ln, d.nm);
-        map.setView([d.la, d.ln], 15);
-    } else {
-        if(S.o) {
-            localStorage.setItem('fp_'+type, JSON.stringify(S.o));
-            tst('tFS', 'ok');
-            updateFavUI();
-        } else {
-            tst('tNF', 'wr');
-        }
-    }
-}
-function updateFavUI() {
-    document.getElementById('homeBtn').classList.toggle('is-set', !!localStorage.getItem('fp_home'));
-    document.getElementById('workBtn').classList.toggle('is-set', !!localStorage.getItem('fp_work'));
-}
-
-// Feature 3: WhatsApp Share
-function shareWA() {
-    if(!S.o || !S.d) return;
-    var r = calc();
-    var txt = `*${tx('title')}*\n\n📍 ${tx('oL')}: ${S.o.nm}\n📍 ${tx('eL')}: ${S.d.nm}\n🚗 ${tx('dist')}: ${S.dist} ${tx('km')}\n💰 ${tx('fp')}: *${r.fair} ${tx('dm')}*\n\n${tx('fb')}`;
-    window.open('https://wa.me/?text='+encodeURIComponent(txt), '_blank');
-}
-
-// Feature 1 & 3 Integration Flow
-function cancelSearch() { clearTimeout(searchTimeout); document.getElementById('srchOvl').style.display = 'none'; }
-
-document.getElementById('calcBtn').addEventListener('click',function(){
-    if(!S.o||!S.d||S.dist<=0)return;
-    document.getElementById('cfmTitle').textContent = tx('cfmT');
-    document.getElementById('cfmMsg').textContent = tx('cfmM');
-    document.getElementById('cfmYes').textContent = tx('cfmY');
-    document.getElementById('cfmMod').style.display = 'flex';
-});
-
-document.getElementById('cfmYes').addEventListener('click', function() {
-    document.getElementById('cfmMod').style.display = 'none';
-    document.getElementById('srchTxt').textContent = tx('srchD');
-    document.getElementById('srchSub').textContent = tx('srchS');
-    document.getElementById('cnclBtn').textContent = tx('cnclS');
-    document.getElementById('srchOvl').style.display = 'flex';
-    searchTimeout = setTimeout(function() {
-        document.getElementById('srchOvl').style.display = 'none';
-        var r = calc();
-        saveTrip();
-        showRes(r);
-        tst('tC','ok');
-    }, 3000);
-});
-
-renderV();renderT();updateFavUI();
+function saveTrip(){if(S.o&&S.d&&S.dist>0){localStorage.setItem('lastFairPriceTrip',JSON.stringify({o:S.o,d:S.d,v:S.v,t:S.t,dmd:S.dmd,night:S.night,toll:S.toll}));}}
+function loadLastTrip(){try{var data=JSON.parse(localStorage.getItem('lastFairPriceTrip'));if(data&&data.o&&data.d){S.v=data.v||'car';S.t=data.t||'m';S.dmd=data.dmd||'n';S.night=data.night||false;S.toll=data.toll||false;renderV();renderT();renderD();document.getElementById('nightTgl').checked=S.night;document.getElementById('tollTgl').checked=S.toll;setO(data.o.la,data.o.ln,data.o.nm);setD(data.d.la,data.d.ln,data.d.nm);}}catch(e){}}
+function useFav(type){var saved=localStorage.getItem('fp_'+type);if(saved){var d=JSON.parse(saved);setO(d.la,d.ln,d.nm);map.setView([d.la,d.ln],15);}else{if(S.o){localStorage.setItem('fp_'+type,JSON.stringify(S.o));tst('tFS','ok');updateFavUI();}else{tst('tNF','wr');}}}
+function updateFavUI(){document.getElementById('homeBtn').classList.toggle('is-set',!!localStorage.getItem('fp_home'));document.getElementById('workBtn').classList.toggle('is-set',!!localStorage.getItem('fp_work'));}
+function shareWA(){if(!S.o||!S.d)return;var r=calc();var txt='*'+tx('title')+'*\n\n📍 '+tx('oL')+': '+S.o.nm+'\n📍 '+tx('eL')+': '+S.d.nm+'\n🚗 '+tx('dist')+': '+S.dist+' '+tx('km')+'\n💰 '+tx('fp')+': *'+r.fair+' '+tx('dm')+'*\n\n'+tx('fb');window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');}
+function cancelSearch(){clearTimeout(searchTimeout);document.getElementById('srchOvl').style.display='none';}
+document.getElementById('calcBtn').addEventListener('click',function(){if(!S.o||!S.d||S.dist<=0)return;document.getElementById('cfmTitle').textContent=tx('cfmT');document.getElementById('cfmMsg').textContent=tx('cfmM');document.getElementById('cfmYes').textContent=tx('cfmY');document.getElementById('cfmMod').style.display='flex';});
+document.getElementById('cfmYes').addEventListener('click',function(){document.getElementById('cfmMod').style.display='none';document.getElementById('srchTxt').textContent=tx('srchD');document.getElementById('srchSub').textContent=tx('srchS');document.getElementById('cnclBtn').textContent=tx('cnclS');document.getElementById('srchOvl').style.display='flex';searchTimeout=setTimeout(function(){document.getElementById('srchOvl').style.display='none';var r=calc();saveTrip();showRes(r);tst('tC','ok');},3000);});
+renderV();renderT();renderD();updateFavUI();
 if('geolocation' in navigator){navigator.geolocation.getCurrentPosition(function(pos){map.setView([pos.coords.latitude,pos.coords.longitude],14);},function(){},{enableHighAccuracy:false,timeout:5000});}
 loadLastTrip();
 </script>
